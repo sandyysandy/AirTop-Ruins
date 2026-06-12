@@ -1,0 +1,2 @@
+# Air Top Ruins.
+This game was made for my year 10 digital tech class where we had to plan out a game, and get our classmates to "invest" in our game with fake money. Then we had to build the game which then we all played in class to find who did the best and got a net gain.

@@ -403,8 +403,9 @@ class MainMenuScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.buttons = {
-            'play': pygame.Rect(220, 170, 200, 50),
-            'editor': pygame.Rect(220, 240, 200, 50)
+            'play': pygame.Rect(220, 140, 200, 50),
+            'editor': pygame.Rect(220, 210, 200, 50),
+            'how_to_play': pygame.Rect(220, 280, 200, 50)
         }
     
     def handle_event(self, event):
@@ -416,6 +417,8 @@ class MainMenuScene(Scene):
                             self.game.switch_scene('game')
                         elif action == 'editor':
                             self.game.switch_scene('editor') 
+                        elif action == 'how_to_play':
+                            self.game.switch_scene('editor') 
 
     def reset(self):
         pass
@@ -425,7 +428,8 @@ class MainMenuScene(Scene):
 
     def renderButtonText(self):
         for action, rect in self.buttons.items():
-            text_surf = self.getFont().render(action.capitalize(), False, (255, 255, 255))
+            text = action.replace("_", " ")
+            text_surf = self.getFont().render(text.capitalize(), False, (255, 255, 255))
             
             text_rect = text_surf.get_rect(center=rect.center)
             
@@ -437,10 +441,11 @@ class MainMenuScene(Scene):
     def render(self):
         self.display.fill(self.background_color)
         title_surf = self.assets['title_font'].render("airTop Ruins", False, (255, 255, 255))
-        title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 110))
+        title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 60))
         self.display.blit(title_surf, title_rect)
         pygame.draw.rect(self.display, (255, 0, 0), self.buttons['play'])
         pygame.draw.rect(self.display, (0, 255, 0), self.buttons['editor'])
+        pygame.draw.rect(self.display, (0, 0, 255), self.buttons['how_to_play'])
         self.renderButtonText()
         return self.display
     
@@ -495,3 +500,50 @@ class EndScene(Scene):
         self.display.blit(text_surf, text_rect)
 
         return self.display
+    
+class HowScene(Scene):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def handle_event(self, event):
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    self.game.switch_scene('main_menu')
+
+    def render(self):
+        self.display.fill((0, 0, 0))
+        font = self.assets['font']
+        text_surf = font.render(f"Thanks for playing! \n \n \n \n Final Time: {self.game.timer}s", False, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 - 100))
+        self.display.blit(text_surf, text_rect)
+        
+        if self.game.final_player_inventory is not None:
+            inventory_text = "Stats:"
+            for item, count in self.game.final_player_inventory.items():
+                inventory_text += f"\n{item}: {count}"
+            text_surf = font.render(inventory_text, False, (255, 255, 255))
+            text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 50))
+            self.display.blit(text_surf, text_rect)
+        
+        point_total = 0
+        if self.game.final_player_inventory is not None:
+            for item, count in self.game.final_player_inventory.items():
+                if item in ['gems', ]:
+                    point_total += count
+                elif item in ['gold_sack']:
+                    point_total += count * 5
+        
+        if self.game.timer < 100:
+            point_total += 50
+        elif self.game.timer < 150:
+            point_total += 30
+        elif self.game.timer < 200:
+            point_total += 20
+            
+        text_surf = font.render(f"Total Points: {point_total}", False, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 150))
+        self.display.blit(text_surf, text_rect)
+
+        return self.display
+
+        
