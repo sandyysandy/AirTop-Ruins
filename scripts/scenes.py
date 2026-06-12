@@ -483,11 +483,11 @@ class EndScene(Scene):
                 elif item in ['gold_sack']:
                     point_total += count * 5
         
-        if self.game.timer < 10:
+        if self.game.timer < 100:
             point_total += 50
-        elif self.game.timer < 20:
+        elif self.game.timer < 150:
             point_total += 30
-        elif self.game.timer < 30:
+        elif self.game.timer < 200:
             point_total += 20
             
         text_surf = font.render(f"Total Points: {point_total}", False, (255, 255, 255))

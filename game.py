@@ -39,7 +39,6 @@ class Game:
             'interactables': load_tile_atlas_transparent('interactables', 4),
             'grass': load_tile_atlas('grass', 11),
             'stone': load_tile_atlas('stone', 9),
-            # 'wood': load_tile_atlas('wood', 9),
             'decor': load_tile_atlas('decor', 4),
             'large_decor': load_images_sorted('tiles/large_decor'),
             'spawn': load_images('spawn')
