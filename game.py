@@ -64,7 +64,7 @@ class Game:
         }
 
         self.level_count = 5
-
+        self.final_player_inventory = None
         self.current_scene = self.scenes['main_menu']
         self.current_time = pygame.time.get_ticks()
 

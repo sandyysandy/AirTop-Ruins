@@ -86,6 +86,8 @@ class GameScene(Scene):
         super().load_level(map_id)
         if self.level == 0:
             self.start_time = pygame.time.get_ticks()
+            self.player.inventory = {}
+        self.player.inventory_last_level = self.player.inventory.copy() # Save current inventory before resetting for new level
         self.transition = -30
         self.player_spawn_pos = self.tilemap.find_spawn_point() or [100, 100]
         self.player.velocity = [0, 0]
@@ -104,6 +106,10 @@ class GameScene(Scene):
         self.level += 1
         if self.level >= self.game.level_count:
             self.level = 0
+            self.game.final_player_inventory = self.player.inventory.copy()
+            self.game.final_player_inventory.pop('silver_keys', None)
+            self.game.final_player_inventory.pop('copper_keys', None)
+            self.game.final_player_inventory.pop('gold_keys', None)
             self.game.switch_scene('end_scene')
         else:
             self.start_transition()
@@ -445,6 +451,7 @@ class EndScene(Scene):
     def handle_event(self, event):
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
+                self.game.final_player_inventory = None # Clear saved inventory after displaying end scene
                 self.game.switch_scene('main_menu')
 
     def reset(self):
@@ -456,7 +463,35 @@ class EndScene(Scene):
     def render(self):
         self.display.fill((0, 0, 0))
         font = self.assets['font']
-        text_surf = font.render(f"Thanks for playing! Final Time: {self.game.timer}s", False, (255, 255, 255))
-        text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2))
+        text_surf = font.render(f"Thanks for playing! \n \n \n \n Final Time: {self.game.timer}s", False, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 - 100))
         self.display.blit(text_surf, text_rect)
+        
+        if self.game.final_player_inventory is not None:
+            inventory_text = "Stats:"
+            for item, count in self.game.final_player_inventory.items():
+                inventory_text += f"\n{item}: {count}"
+            text_surf = font.render(inventory_text, False, (255, 255, 255))
+            text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 50))
+            self.display.blit(text_surf, text_rect)
+        
+        point_total = 0
+        if self.game.final_player_inventory is not None:
+            for item, count in self.game.final_player_inventory.items():
+                if item in ['gems', ]:
+                    point_total += count
+                elif item in ['gold_sack']:
+                    point_total += count * 5
+        
+        if self.game.timer < 10:
+            point_total += 50
+        elif self.game.timer < 20:
+            point_total += 30
+        elif self.game.timer < 30:
+            point_total += 20
+            
+        text_surf = font.render(f"Total Points: {point_total}", False, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, self.display.get_height() // 2 + 150))
+        self.display.blit(text_surf, text_rect)
+
         return self.display

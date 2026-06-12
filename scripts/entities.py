@@ -12,6 +12,7 @@ class PhysicsEntity(Object):
         self.dashing = False
         self.speed = 1.5
         self.inventory = {}
+        self.inventory_last_level = {}
         self.last_movement = [0, 0]
 
         self.current_interactable = None
@@ -41,7 +42,7 @@ class PhysicsEntity(Object):
 
             frame_movement = (self.velocity[0], self.velocity[1])
 
-        # X axis collision calculation
+        # --- X AXIS COLLISION (Tiles) ---
         self.pos[0] += frame_movement[0]
         entity_rect = self.rect()
         for rect in tilemap.physical_rect_around(self.pos):
@@ -53,8 +54,8 @@ class PhysicsEntity(Object):
                     entity_rect.left = rect.right
                     self.collisions['left'] = True
                 self.pos[0] = entity_rect.x
-                self.velocity[0] = 0
 
+        # --- X AXIS COLLISION (Interactables) ---
         for interactable in self.scene.interactables:
             if interactable.should_collide(self) and entity_rect.colliderect(interactable.rect()):
                 if frame_movement[0] > 0:
@@ -64,9 +65,9 @@ class PhysicsEntity(Object):
                     entity_rect.left = interactable.rect().right
                     self.collisions['left'] = True
                 self.pos[0] = entity_rect.x
-                self.velocity[0] = 0
 
-        # Y axis collision calculation
+
+        # --- Y AXIS COLLISION (Tiles) ---
         self.pos[1] += frame_movement[1]
         entity_rect = self.rect()
         for rect in tilemap.physical_rect_around(self.pos):
@@ -80,6 +81,7 @@ class PhysicsEntity(Object):
                 self.pos[1] = entity_rect.y
                 self.velocity[1] = 0
 
+        # --- Y AXIS COLLISION (Interactables) ---
         for interactable in self.scene.interactables:
             if interactable.should_collide(self) and entity_rect.colliderect(interactable.rect()):
                 if frame_movement[1] > 0:
@@ -89,7 +91,7 @@ class PhysicsEntity(Object):
                     entity_rect.top = interactable.rect().bottom
                     self.collisions['up'] = True
                 self.pos[1] = entity_rect.y
-                self.velocity[1] = 0            
+                self.velocity[1] = 0
 
         if not is_dashing:
             if movement[0] > 0:
@@ -118,9 +120,6 @@ class PhysicsEntity(Object):
                 self.current_interactable = interactable
                 break
         
-        # print(f"Frame Movement: {frame_movement}, Collisions: {self.collisions}")
-
-
     def useItem(self, item, amount):
         if item in self.inventory and self.inventory[item] >= amount:
             self.inventory[item] -= amount
@@ -134,7 +133,7 @@ class PhysicsEntity(Object):
             self.current_interactable.interact(self)
 
     def death(self):
-        self.inventory = {}
+        self.inventory = self.inventory_last_level.copy() # Reset inventory to what it was at the start of the level
         self.scene.start_transition()
 
     def landedOnGround(self):
@@ -228,7 +227,6 @@ class Player(PhysicsEntity):
     def sprint(self):
         self.sprinting = not self.sprinting
     
-
     def dash(self):
         if self.dash_timer <= 0 and self.dash_cooldown <= 0 and self.dashes > 0:
             self.dash_timer = 12    # Active dash burst length in frames
