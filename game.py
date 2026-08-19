@@ -32,7 +32,7 @@ class Game:
         self.screen = pygame.display.set_mode((screen_width, screen_height), pygame.NOFRAME)
         self.clock = pygame.time.Clock()
         self.timer = 0
-        self.new_game_plus = True
+        self.new_game_plus = False
         self.grappling_hook_enabled = False
 
         self.tiles = {

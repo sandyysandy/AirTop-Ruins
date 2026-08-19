@@ -87,31 +87,29 @@ class GameScene(Scene):
             if event.key == pygame.K_d:
                 if not self.tab: self.movement[1] = True
                 self.free_movement[1] = True
-            if event.key == pygame.K_SPACE or event.key == pygame.K_w:
+            if event.key == pygame.K_SPACE or event.key == pygame.K_w or event.key == pygame.K_UP:
                 if not self.tab: self.player.jump()
                 self.free_movement[2] = True
-            if event.key == pygame.K_s:
+            if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 self.free_movement[3] = True
             if event.key == pygame.K_LSHIFT:
                 self.player.sprint()
-            if event.key == pygame.K_e:
-                self.player.use()
             if event.key == pygame.K_c:
+                self.player.use()
+            if event.key == pygame.K_x:
                 self.player.dash()
             if event.key == pygame.K_r:
                 self.player.death()
-            if event.key == pygame.K_v or event.key == pygame.K_x:
-                self.player.fire_grapple(self.tilemap)
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_a:
+            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                 self.movement[0] = False
                 self.free_movement[0] = False
-            if event.key == pygame.K_d:
+            if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 self.movement[1] = False
                 self.free_movement[1] = False
-            if event.key == pygame.K_SPACE or event.key == pygame.K_w:
+            if event.key == pygame.K_SPACE or event.key == pygame.K_w or event.key == pygame.K_UP:
                 self.free_movement[2] = False
-            if event.key == pygame.K_s:
+            if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 self.free_movement[3] = False
             if event.key == pygame.K_TAB:
                 self.tab = not self.tab
@@ -129,7 +127,7 @@ class GameScene(Scene):
             self.player.inventory = {}
             if self.game.new_game_plus:
                 self.player.inventory['grappling_hook'] = 1
-        self.player.inventory_last_level = self.player.inventory.copy() # Save current inventory before resetting for new level
+        self.player.inventory_last_level = self.player.inventory.copy()
         self.transition = -30
         self.player_spawn_pos = self.tilemap.find_spawn_point() or [100, 100]
         self.player.velocity = [0, 0]
@@ -605,25 +603,26 @@ class HowToPlayScene(Scene):
         
         # Simple back button at the bottom of the screen
         self.buttons = {
-            'back': pygame.Rect(self.display.get_width() // 2 - 50, self.display.get_height() - 50, 100, 30)
+            'back': pygame.Rect(self.display.get_width() // 2 - 50, self.display.get_height() - 40, 100, 30)
         }
         
-        # Here is where you can fill in your controls! 
-        # Each string in this list will be rendered on a new line.
+        # Updated instructions with grapple, rope climbing, and dash info
         self.instructions = [
             "Controls:",
-            "Move - [Left and Right Arrow Keys]",
-            "Jump - [Space, Up Arrow]",
-            "Dash - [X]",
-            "Interact - [Z]",
-            "Reset Level - [R]",
+            "Move - [A / D or Left and Right Arrow Keys]",
+            "Jump - [Space, W, or Up Arrow]",
+            "Climb Rope - [W / S or Up / Down Keys (While Grappled)]",
+            "Dash - [X]  |  Sprint - [Left Shift]",
+            "Interact - [C]  |  Reset Level - [R]",
+            "Fire Grapple - [Left Mouse Click]",
             "Free Cam - [Tab]",
             "",
-            "You also can double jump and double dash in mid air and wall slide and jump",
+            "Abilities:",
+            "Double jump, wall slide, wall jump, and double dash!",
+            "Use the Main Menu to toggle Grappling Hook New Game+ mode.",
             "",
             "Objective:",
-            "Collect keys and find the purple portal and finish all 5 levels!"
-
+            "Collect items, find keys, use the grapple, and reach the end!"
         ]
 
     def handle_event(self, event):
@@ -643,13 +642,13 @@ class HowToPlayScene(Scene):
         
         # 2. Draw Title
         title_surf = self.assets['title_font'].render("How to Play", False, (255, 255, 255))
-        title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 40))
+        title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 35))
         self.display.blit(title_surf, title_rect)
 
         # 3. Draw Instructions
         font = self.getFont()
-        start_y = 90
-        line_spacing = 20
+        start_y = 75
+        line_spacing = 18  # Slightly tighter spacing to fit extra text lines cleanly
         
         for i, text in enumerate(self.instructions):
             text_surf = font.render(text, False, (255, 255, 255))
@@ -658,7 +657,6 @@ class HowToPlayScene(Scene):
 
         # 4. Draw Back Button
         for action, rect in self.buttons.items():
-            # Optional: Draw a dark box behind the button text so it looks like a button
             pygame.draw.rect(self.display, (30, 100, 150), rect, border_radius=4) 
             
             text_surf = font.render(action.capitalize(), False, (255, 255, 255))
@@ -666,5 +664,4 @@ class HowToPlayScene(Scene):
             self.display.blit(text_surf, text_rect)
         
         return self.display
-
         
