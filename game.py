@@ -3,7 +3,7 @@ import os
 import pygame
 import sys
 
-from scripts.scenes import EndScene, GameScene, EditorScene, MainMenuScene
+from scripts.scenes import EndScene, GameScene, EditorScene, HowToPlayScene, MainMenuScene
 from scripts.utils import load_font, load_image , load_images, load_tile_atlas, load_images_sorted, load_tile_atlas_transparent
 
 
@@ -25,14 +25,15 @@ class Game:
         pygame.display.set_caption('AirTop Ruins')
         # Fixed internal game resolution
         self.game_width = 320*2
-        self.game_height = 180*2
+        self.game_height = 200*2
         
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.screen = pygame.display.set_mode((screen_width, screen_height), pygame.NOFRAME)
         self.clock = pygame.time.Clock()
         self.timer = 0
-
+        self.new_game_plus = True
+        self.grappling_hook_enabled = False
 
         self.tiles = {
             'items': load_tile_atlas_transparent('items', 5),
@@ -59,7 +60,8 @@ class Game:
             'main_menu': MainMenuScene(self),
             'game': GameScene(self),
             'editor': EditorScene(self),
-            'end_scene': EndScene(self)
+            'end_scene': EndScene(self),
+            'how_to_play': HowToPlayScene(self)
         }
 
         self.level_count = 5
@@ -92,6 +94,9 @@ class Game:
 
                 self.current_scene.handle_event(event)
             
+            if not self.new_game_plus:
+                self.grappling_hook_enabled = False 
+
             self.current_time = pygame.time.get_ticks()
             self.current_scene.update()
             
@@ -103,4 +108,4 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
-Game(1920, 1080).run()
+Game(1920, 1200).run()

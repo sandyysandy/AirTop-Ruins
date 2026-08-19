@@ -113,6 +113,13 @@ class TileMap:
         self.tile_size = data['tile_size']
         self.offgrid_tiles = data['offgrid_tiles']
 
+    def is_solid_tile(self, pos):
+        tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
+        check_loc = str(tile_loc[0]) + ';' + str(tile_loc[1])
+        if check_loc in self.tilemap:
+            return self.tilemap[check_loc]['type'] in PHYSICS_TILES
+        return False
+
     def autotile(self, start_pos=None):
         tiles_to_update = set()
         
@@ -190,9 +197,12 @@ class TileMap:
             tile_type = tile['type']
             tile_variant = tile['variant']
             tile_pos = tile['pos']
-
-            surf.blit(self.sprites[tile_type][tile_variant], (int(tile_pos[0] - offset[0]), int(tile_pos[1] - offset[1])))
-
+            try:
+                surf.blit(self.sprites[tile_type][tile_variant], (int(tile_pos[0] - offset[0]), int(tile_pos[1] - offset[1])))
+            except IndexError:
+                print(f"CRASH: Trying to load '{tile_type}' variant {tile_variant}.")
+                print(f"You only have {len(self.sprites[tile_type])} sprites loaded for '{tile_type}'.")
+            
         for x in range(int(offset[0]) // self.tile_size, (int(offset[0]) + surf.get_width()) // self.tile_size + 1):
             for y in range(int(offset[1]) // self.tile_size - 1, (int(offset[1]) + surf.get_height()) // self.tile_size + 1):
                 tile_loc = str(x) + ';' + str(y)
