@@ -184,7 +184,7 @@ class Player(PhysicsEntity):
         center_x = self.rect().centerx
         center_y = self.rect().centery
         
-        # FIX: Use the scene's calculated world-space mouse position!
+        # Use the scene's calculated world-space mouse position!
         mouse_x, mouse_y = self.scene.mouse_pos
 
         angle = math.atan2(mouse_y - center_y, mouse_x - center_x)
@@ -198,7 +198,6 @@ class Player(PhysicsEntity):
             test_y += math.sin(angle) * step_size
             current_dist += step_size
         
-            # This will now accurately check the grid based on correct world coordinates
             if tilemap.is_solid_tile((test_x, test_y)):
                 self.grapple_attached = True
                 self.grapple_pos = [test_x, test_y]
@@ -284,7 +283,7 @@ class Player(PhysicsEntity):
             center_x, center_y = self.rect().centerx, self.rect().centery
             dist_to_hook = math.hypot(self.grapple_pos[0] - center_x, self.grapple_pos[1] - center_y)
         
-            # --- NEW: Climb up or down the rope using W and S keys ---
+            # Climb up or down the rope using W and S keys
             keys = pygame.key.get_pressed()
             climb_speed = 1.0
             if keys[pygame.K_w] or keys[pygame.K_UP]:

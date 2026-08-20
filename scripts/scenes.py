@@ -305,16 +305,16 @@ class EditorScene(Scene):
                 if event.button == 5: # Scroll down
                     self.tile_variant = (self.tile_variant + 1) % len(self.tile_sprites[self.tile_list[self.tile_group]])
             else:
-                if event.button == 4:
+                if event.button == 4: # Scroll up
                     self.tile_group = (self.tile_group - 1) % len(self.tile_list)
                     self.tile_variant = 0
-                if event.button == 5:
+                if event.button == 5: # Scroll down
                     self.tile_group = (self.tile_group + 1) % len(self.tile_list)
                     self.tile_variant = 0
         if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
+            if event.button == 1: # Left mouse button
                 self.clicking = False
-            if event.button == 3:
+            if event.button == 3: # Right mouse button
                 self.right_clicking = False
 
         if event.type == pygame.KEYDOWN:
@@ -508,10 +508,9 @@ class EndScene(Scene):
                             self.game.switch_scene('main_menu')
 
     def render(self):
-        # 1. Draw Background
         self.display.fill(self.background_color)
         
-        # 2. Draw a dark UI panel for the stats to sit inside
+        # Draw a dark UI panel for the stats to sit inside
         panel_width = 240
         panel_height = self.display.get_height() - 150
         panel_rect = pygame.Rect(self.display.get_width() // 2 - (panel_width // 2), 80, panel_width, panel_height)
@@ -523,12 +522,11 @@ class EndScene(Scene):
         font = self.assets['font']
         title_font = self.assets['title_font']
         
-        # 3. Draw Title
+        # Draw Title
         title_surf = title_font.render("You Finished The Game!", False, (255, 215, 0)) # Gold color
         title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 45))
         self.display.blit(title_surf, title_rect)
         
-        # 4. Draw Stats line by line
         start_y = 110
         line_spacing = 20
         
@@ -554,7 +552,7 @@ class EndScene(Scene):
                 elif item == 'gold_sack':
                     point_total += count * 5
             
-            # 5. Calculate and Draw Time Bonus Breakdowns
+            # Calculate and Draw Time Bonus Breakdowns
             timer = getattr(self.game, 'timer', 999)
             time_bonus = 0
             if timer < 250:
@@ -568,29 +566,23 @@ class EndScene(Scene):
             
             start_y += 10 # Extra padding gap before time info
             
-            # Render clear time
             time_surf = font.render(f"Clear Time: {int(timer)}s", False, (200, 200, 200))
             time_rect = time_surf.get_rect(center=(self.display.get_width() // 2, start_y))
             self.display.blit(time_surf, time_rect)
             start_y += line_spacing
             
-            # Render specific time bonus text line (soft gold text)
             bonus_surf = font.render(f"Time Bonus: +{time_bonus}", False, (255, 240, 150))
             bonus_rect = bonus_surf.get_rect(center=(self.display.get_width() // 2, start_y))
             self.display.blit(bonus_surf, bonus_rect)
             start_y += line_spacing + 5
             
-            # Highlight the total combined score in green
             score_surf = font.render(f"Total Score: {point_total}", False, (100, 255, 100)) 
             score_rect = score_surf.get_rect(center=(self.display.get_width() // 2, start_y))
             self.display.blit(score_surf, score_rect)
         
-        # 6. Draw Main Menu Button
         for action, rect in self.buttons.items():
-            # Button background
             pygame.draw.rect(self.display, (50, 150, 200), rect, border_radius=5) 
             
-            # Button text
             btn_surf = font.render(action.title(), False, (255, 255, 255))
             btn_rect = btn_surf.get_rect(center=rect.center)
             self.display.blit(btn_surf, btn_rect)
@@ -601,12 +593,10 @@ class HowToPlayScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         
-        # Simple back button at the bottom of the screen
         self.buttons = {
             'back': pygame.Rect(self.display.get_width() // 2 - 50, self.display.get_height() - 40, 100, 30)
         }
         
-        # Updated instructions with grapple, rope climbing, and dash info
         self.instructions = [
             "Controls:",
             "Move - [A / D or Left and Right Arrow Keys]",
@@ -637,25 +627,24 @@ class HowToPlayScene(Scene):
         return self.assets['font']
 
     def render(self):
-        # 1. Draw Background
+        # Draw Background
         self.display.fill(self.background_color)
         
-        # 2. Draw Title
+        # Draw Title
         title_surf = self.assets['title_font'].render("How to Play", False, (255, 255, 255))
         title_rect = title_surf.get_rect(center=(self.display.get_width() // 2, 35))
         self.display.blit(title_surf, title_rect)
 
-        # 3. Draw Instructions
         font = self.getFont()
         start_y = 75
-        line_spacing = 18  # Slightly tighter spacing to fit extra text lines cleanly
+        line_spacing = 18
         
         for i, text in enumerate(self.instructions):
             text_surf = font.render(text, False, (255, 255, 255))
             text_rect = text_surf.get_rect(center=(self.display.get_width() // 2, start_y + (i * line_spacing)))
             self.display.blit(text_surf, text_rect)
 
-        # 4. Draw Back Button
+        # Draw Back Button
         for action, rect in self.buttons.items():
             pygame.draw.rect(self.display, (30, 100, 150), rect, border_radius=4) 
             
